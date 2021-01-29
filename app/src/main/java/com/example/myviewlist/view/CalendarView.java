@@ -134,6 +134,14 @@ public class CalendarView extends LinearLayout {
                     dateBean.setIsToday("0");
                 }
 
+                //判断是否为今天之前的天数
+                if(calendar.before(mCalendar)){
+                    dateBean.setIsTodayPrev("1");
+                }else{
+                    dateBean.setIsTodayPrev("0");
+                }
+
+
                 dateBean.setTime(currentDate);
 
                 cellData.add(dateBean);
@@ -281,6 +289,8 @@ public class CalendarView extends LinearLayout {
             } else {
                 holder.mTvTitle.setText("");
             }
+
+            //是否为今天
             if("1".equals(dateBean.getIsToday())){
                 holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
                 holder.mTvDesc.setText("今天");
@@ -288,6 +298,13 @@ public class CalendarView extends LinearLayout {
             }else{
                 holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
                 holder.mTvDesc.setVisibility(GONE);
+            }
+
+            //是否为今天前面的数据
+            if("1".equals(dateBean.getIsTodayPrev())){
+                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext,R.color.color_999999));
+            }else{
+                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext,R.color.color_333333));
             }
 
 
@@ -316,9 +333,13 @@ public class CalendarView extends LinearLayout {
     }
 
     private class DateBean {
+        //是否为无效数据
         private String inValid;
-        private String preOrNext;
+        //是否为今天以前的数据
+        private String isTodayPrev;
+        //每天的时间
         private Date time;
+        //是否为今天
         private String isToday;
 
         public void setIsToday(String isToday) {
@@ -333,12 +354,12 @@ public class CalendarView extends LinearLayout {
             this.inValid = inValid;
         }
 
-        public String getPreOrNext() {
-            return preOrNext;
+        public String getIsTodayPrev() {
+            return isTodayPrev;
         }
 
-        public void setPreOrNext(String preOrNext) {
-            this.preOrNext = preOrNext;
+        public void setIsTodayPrev(String isTodayPrev) {
+            this.isTodayPrev = isTodayPrev;
         }
 
         public String getInValid() {
