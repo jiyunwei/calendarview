@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,8 @@ public class CalendarView extends LinearLayout {
     private Calendar mCalendar;
     //最多展示的月数
     private int monthMaxCount = 6;
+    private Date mNowDate;
+    private int mStartMonth;
 
 
     public void setOnDateSelectedListener(OnDateSelectedListener onDateSelectedListener) {
@@ -72,7 +75,6 @@ public class CalendarView extends LinearLayout {
         mRvMonths.setAdapter(mMonthAdapter);
         mRvMonths.setLayoutManager(new LinearLayoutManager(context));
 
-        mCalendar = Calendar.getInstance();
 
         //添加视图
         addView(mView);
@@ -87,13 +89,16 @@ public class CalendarView extends LinearLayout {
      * 加载天的数据
      */
     private void loadDayData() {
+        mCalendar = Calendar.getInstance();
+        //当前月份
+        mStartMonth = mCalendar.get(Calendar.MONTH);
+        //当前时间
+        mNowDate = mCalendar.getTime();
 
         List<MonthDataBean> calendarData = new ArrayList<>();
         DateFormat df = new SimpleDateFormat("yyyy年MM月");
 
-        int tempCurrentMonth = mCalendar.get(Calendar.MONTH);
-
-        for (int i = tempCurrentMonth; i < tempCurrentMonth+monthMaxCount; i++) {
+        for (int i = mStartMonth; i < mStartMonth + monthMaxCount; i++) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.DAY_OF_MONTH, 1);
             calendar.set(Calendar.MONTH, i);
@@ -107,7 +112,7 @@ public class CalendarView extends LinearLayout {
             List<DateBean> cellData = new ArrayList<>();
             //当月的最大天数
             int maxDays = getCurrentMonthMaxDays(i);
-            maxDays = maxDays+dayOfWeek;
+            maxDays = maxDays + dayOfWeek;
 
             while (cellData.size() < maxDays) {
                 //判断是否为当前月的时间
@@ -120,6 +125,15 @@ public class CalendarView extends LinearLayout {
                     dateBean.setInValid("0");
 
                 }
+
+                //判断是否为今天
+                if (calendar.get(Calendar.YEAR) ==mCalendar.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == mCalendar.get(Calendar.MONTH) && calendar.get(Calendar.DATE) == mCalendar.get(Calendar.DATE)) {
+                    Log.d(TAG, "loadDayData: 设置了今天的标识...");
+                    dateBean.setIsToday("1");
+                }else{
+                    dateBean.setIsToday("0");
+                }
+
                 dateBean.setTime(currentDate);
 
                 cellData.add(dateBean);
@@ -145,16 +159,17 @@ public class CalendarView extends LinearLayout {
 
     /**
      * 获取某个月的最大天数
+     *
      * @param tempCurrentMonth
      * @return
      */
-    private int  getCurrentMonthMaxDays(int tempCurrentMonth) {
-        Log.d(TAG, "getCurrentMonthMaxDays: tempCurrentMonth = "+tempCurrentMonth);
+    private int getCurrentMonthMaxDays(int tempCurrentMonth) {
+        Log.d(TAG, "getCurrentMonthMaxDays: tempCurrentMonth = " + tempCurrentMonth);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.set(Calendar.MONTH,tempCurrentMonth);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.MONTH, tempCurrentMonth);
         int maximum = calendar.getActualMaximum(Calendar.DATE);
-        Log.d(TAG, "getCurrentMonthMaxDays: "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime())+"月份的最大天数 = "+maximum);
+        Log.d(TAG, "getCurrentMonthMaxDays: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime()) + "月份的最大天数 = " + maximum);
         return maximum;
     }
 
@@ -240,11 +255,12 @@ public class CalendarView extends LinearLayout {
         }
 
         class DayAdapterViewHolder extends RecyclerView.ViewHolder {
-            TextView mTvTitle;
+            TextView mTvTitle,mTvDesc;
 
             public DayAdapterViewHolder(@NonNull View itemView) {
                 super(itemView);
                 mTvTitle = itemView.findViewById(R.id.tvTitle);
+                mTvDesc = itemView.findViewById(R.id.tvDesc);
 
             }
         }
@@ -264,6 +280,14 @@ public class CalendarView extends LinearLayout {
                 holder.mTvTitle.setText(String.valueOf(dateBean.getTime().getDate()));
             } else {
                 holder.mTvTitle.setText("");
+            }
+            if("1".equals(dateBean.getIsToday())){
+                holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+                holder.mTvDesc.setText("今天");
+                holder.mTvDesc.setVisibility(VISIBLE);
+            }else{
+                holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+                holder.mTvDesc.setVisibility(GONE);
             }
 
 
@@ -295,7 +319,15 @@ public class CalendarView extends LinearLayout {
         private String inValid;
         private String preOrNext;
         private Date time;
+        private String isToday;
 
+        public void setIsToday(String isToday) {
+            this.isToday = isToday;
+        }
+
+        public String getIsToday() {
+            return isToday;
+        }
 
         public void setInValid(String inValid) {
             this.inValid = inValid;
