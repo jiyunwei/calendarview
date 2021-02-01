@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MyViewList</string>
+    <string-array name="main_list">
+        <item>基础日历</item>
+        <item>酒店日历</item>
+    </string-array>
 </resources>

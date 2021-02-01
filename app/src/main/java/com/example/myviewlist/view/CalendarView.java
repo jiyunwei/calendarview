@@ -2,7 +2,6 @@ package com.example.myviewlist.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -11,10 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,10 +27,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class CalendarView extends LinearLayout {
-    private static final String TAG = "CalendarView";
+public class CalendarView extends LinearLayout implements IBaseCalendar {
+    protected static final String TAG = "CalendarView";
 
     private View mView;
     private OnDateSelectedListener onDateSelectedListener;
@@ -42,6 +40,22 @@ public class CalendarView extends LinearLayout {
     private int monthMaxCount = 6;
     private Date mNowDate;
     private int mStartMonth;
+    protected DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Date enter; //入住酒店的时间
+    private Date out; //离开酒店的时间
+
+    protected void setEnterAndOutHotelTime(Date enter, Date out) {
+        this.enter = enter;
+        this.out = out;
+
+        if(enter==null && out == null){
+
+        }else{
+            mMonthAdapter.notifyDataSetChanged();
+            logd("刷新月份适配器...");
+        }
+
+    }
 
 
     public void setOnDateSelectedListener(OnDateSelectedListener onDateSelectedListener) {
@@ -127,17 +141,17 @@ public class CalendarView extends LinearLayout {
                 }
 
                 //判断是否为今天
-                if (calendar.get(Calendar.YEAR) ==mCalendar.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == mCalendar.get(Calendar.MONTH) && calendar.get(Calendar.DATE) == mCalendar.get(Calendar.DATE)) {
+                if (calendar.get(Calendar.YEAR) == mCalendar.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == mCalendar.get(Calendar.MONTH) && calendar.get(Calendar.DATE) == mCalendar.get(Calendar.DATE)) {
                     Log.d(TAG, "loadDayData: 设置了今天的标识...");
                     dateBean.setIsToday("1");
-                }else{
+                } else {
                     dateBean.setIsToday("0");
                 }
 
                 //判断是否为今天之前的天数
-                if(calendar.before(mCalendar)){
+                if (calendar.before(mCalendar)) {
                     dateBean.setIsTodayPrev("1");
-                }else{
+                } else {
                     dateBean.setIsTodayPrev("0");
                 }
 
@@ -263,7 +277,7 @@ public class CalendarView extends LinearLayout {
         }
 
         class DayAdapterViewHolder extends RecyclerView.ViewHolder {
-            TextView mTvTitle,mTvDesc;
+            TextView mTvTitle, mTvDesc;
 
             public DayAdapterViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -290,31 +304,87 @@ public class CalendarView extends LinearLayout {
                 holder.mTvTitle.setText("");
             }
 
+            //是否为今天前面的数据
+            if ("1".equals(dateBean.getIsTodayPrev())) {
+                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext, R.color.color_999999));
+            } else {
+                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext, R.color.color_333333));
+            }
+
             //是否为今天
-            if("1".equals(dateBean.getIsToday())){
-                holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
-                holder.mTvDesc.setText("今天");
+            if ("1".equals(dateBean.getIsToday())) {
+                setTodayTitleAndSize(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean);
                 holder.mTvDesc.setVisibility(VISIBLE);
-            }else{
-                holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+            } else {
+                holder.mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                 holder.mTvDesc.setVisibility(GONE);
             }
 
-            //是否为今天前面的数据
-            if("1".equals(dateBean.getIsTodayPrev())){
-                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext,R.color.color_999999));
-            }else{
-                holder.mTvTitle.setTextColor(ContextCompat.getColor(mContext,R.color.color_333333));
+            if (enter != null) {
+                if ("1".equals(dateBean.getInValid())
+                        && "0".equals(dateBean.getIsTodayPrev())
+                        && compareDateEquals(enter, dateBean.getTime())) {
+                    logd("入住时间..."+sdf.format(enter));
+                    dealEnterOrOutDayStyle(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean,true);
+                }
+
+                if(out!=null){
+                    if ("1".equals(dateBean.getInValid())
+                            && "0".equals(dateBean.getIsTodayPrev())
+                            && compareDate(out,enter)
+                            && compareDateEquals(out, dateBean.getTime())) {
+                        logd("离店时间..."+sdf.format(out));
+                        dealEnterOrOutDayStyle(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean,false);
+                    }
+                }
             }
 
+            holder.itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dealOnDayClicked(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean);
+                }
+            });
 
         }
+
 
         @Override
         public int getItemCount() {
             return mData == null ? 0 : mData.size();
         }
     }
+
+    /**
+     * 处理酒店日历中入住和离店的时间选中效果
+     * @param itemView
+     * @param mTvTitle
+     * @param mTvDesc
+     * @param dateBean
+     * @param isEnter
+     */
+    protected void dealEnterOrOutDayStyle(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean, boolean isEnter) {
+
+    }
+
+    /**
+     * 处理天的点击时间
+     *
+     * @param itemView
+     * @param mTvTitle
+     * @param mTvDesc
+     * @param dateBean
+     */
+    public void dealOnDayClicked(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+        Log.d(TAG, "dealOnDayClicked: 基础日历处理天item的点击事件...");
+    }
+
+    protected void setTodayTitleAndSize(@NonNull View itemView, @NonNull TextView titleView, @NonNull TextView descView, DateBean dateBean) {
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        descView.setText("今天");
+    }
+
+
 
     public interface OnDateSelectedListener {
         //入住时间 和离店时间的监听
@@ -332,7 +402,7 @@ public class CalendarView extends LinearLayout {
         }
     }
 
-    private class DateBean {
+    protected class DateBean {
         //是否为无效数据
         private String inValid;
         //是否为今天以前的数据
@@ -373,6 +443,74 @@ public class CalendarView extends LinearLayout {
         public void setTime(Date time) {
             this.time = time;
         }
+    }
+
+
+    protected void showToast(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    protected void logd(String info) {
+        Log.d(TAG, info);
+    }
+
+    protected String formatDateToStandardTime(Date date) {
+        return sdf.format(date);
+    }
+
+    /**
+     * 对比两个Date 大小
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
+    protected boolean compareDate(Date date1, Date date2) {
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+        return calendar1.compareTo(calendar2) > 0;
+    }
+
+    /**
+     * 对比两个Date 是否日期相等
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
+    protected boolean compareDateEquals(Date date1, Date date2) {
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+
+        return calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)
+                && calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)
+                && calendar1.get(Calendar.DATE) == calendar2.get(Calendar.DATE);
+    }
+
+
+    /**
+     * 判断Date1 是否在Date2 30天的范围内
+     * @param date1
+     * @param date2
+     * @return
+     */
+    protected boolean compareLessThan30Day(Date date1,Date date2){
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+        calendar2.add(Calendar.DAY_OF_MONTH,30);
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+        return calendar1.compareTo(calendar2)<=0;
     }
 
 }
