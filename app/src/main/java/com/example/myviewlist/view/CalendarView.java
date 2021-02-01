@@ -48,9 +48,9 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
         this.enter = enter;
         this.out = out;
 
-        if(enter==null && out == null){
+        if (enter == null && out == null) {
 
-        }else{
+        } else {
             mMonthAdapter.notifyDataSetChanged();
             logd("刷新月份适配器...");
         }
@@ -278,11 +278,13 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
 
         class DayAdapterViewHolder extends RecyclerView.ViewHolder {
             TextView mTvTitle, mTvDesc;
+            LinearLayout mLLDay;
 
             public DayAdapterViewHolder(@NonNull View itemView) {
                 super(itemView);
                 mTvTitle = itemView.findViewById(R.id.tvTitle);
                 mTvDesc = itemView.findViewById(R.id.tvDesc);
+                mLLDay = itemView.findViewById(R.id.ll_day);
 
             }
         }
@@ -324,18 +326,29 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
                 if ("1".equals(dateBean.getInValid())
                         && "0".equals(dateBean.getIsTodayPrev())
                         && compareDateEquals(enter, dateBean.getTime())) {
-                    logd("入住时间..."+sdf.format(enter));
-                    dealEnterOrOutDayStyle(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean,true);
+                    logd("入住时间..." + sdf.format(enter));
+                    dealEnterOrOutDayStyle(holder.itemView, holder.mLLDay, holder.mTvTitle, holder.mTvDesc, dateBean, true);
                 }
 
-                if(out!=null){
+                if (out != null) {
                     if ("1".equals(dateBean.getInValid())
                             && "0".equals(dateBean.getIsTodayPrev())
-                            && compareDate(out,enter)
+                            && compareDate(out, enter)
                             && compareDateEquals(out, dateBean.getTime())) {
-                        logd("离店时间..."+sdf.format(out));
-                        dealEnterOrOutDayStyle(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean,false);
+                        logd("离店时间..." + sdf.format(out));
+                        dealEnterOrOutDayStyle(holder.itemView, holder.mLLDay, holder.mTvTitle, holder.mTvDesc, dateBean, false);
                     }
+
+
+                    //处理入住 与 离店日期中间天的背景
+                    if (compareGreaterThan(dateBean.getTime(), enter)
+                            && compareLessThan(dateBean.getTime(), out)
+                            && !compareDateEquals(dateBean.getTime(), out)
+                            && "1".equals(dateBean.getInValid())
+                            && "0".equals(dateBean.getIsTodayPrev())) {
+                        dealInEnterAndOutTimeStyle(holder.itemView, holder.mLLDay, holder.mTvTitle, holder.mTvDesc, dateBean);
+                    }
+
                 }
             }
 
@@ -356,14 +369,27 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
     }
 
     /**
+     * 处理在入住 和 离店时间中间的item的背景
+     *
+     * @param itemView
+     * @param mTvTitle
+     * @param mTvDesc
+     * @param dateBean
+     */
+    protected void dealInEnterAndOutTimeStyle(View itemView, LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+
+    }
+
+    /**
      * 处理酒店日历中入住和离店的时间选中效果
+     *
      * @param itemView
      * @param mTvTitle
      * @param mTvDesc
      * @param dateBean
      * @param isEnter
      */
-    protected void dealEnterOrOutDayStyle(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean, boolean isEnter) {
+    protected void dealEnterOrOutDayStyle(View itemView, LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean, boolean isEnter) {
 
     }
 
@@ -383,7 +409,6 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         descView.setText("今天");
     }
-
 
 
     public interface OnDateSelectedListener {
@@ -499,18 +524,55 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
 
     /**
      * 判断Date1 是否在Date2 30天的范围内
+     *
      * @param date1
      * @param date2
      * @return
      */
-    protected boolean compareLessThan30Day(Date date1,Date date2){
+    protected boolean compareLessThan30Day(Date date1, Date date2) {
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(date2);
-        calendar2.add(Calendar.DAY_OF_MONTH,30);
+        calendar2.add(Calendar.DAY_OF_MONTH, 30);
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.setTime(date1);
-        return calendar1.compareTo(calendar2)<=0;
+        return calendar1.compareTo(calendar2) <= 0;
+    }
+
+    /**
+     * date1 < date2
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
+    protected boolean compareLessThan(Date date1, Date date2) {
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+        return calendar1.compareTo(calendar2) < 0;
+    }
+
+    /**
+     * date1 > date2
+     *
+     * @param date1
+     * @param date2
+     * @return
+     */
+    protected boolean compareGreaterThan(Date date1, Date date2) {
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(date1);
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+
+        return calendar1.compareTo(calendar2) > 0;
     }
 
 }

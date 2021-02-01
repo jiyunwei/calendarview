@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class HotelCalendarView extends CalendarView {
             super.handleMessage(msg);
             if (enterHotelTime != null && outHotelTime != null) {
                 logd("选择的入住日期：" + sdf.format(enterHotelTime) + " 离店日期：" + sdf.format(outHotelTime));
+                showToast("选择的入住日期：" + sdf.format(enterHotelTime) + " 离店日期：" + sdf.format(outHotelTime));
             }
         }
     };
@@ -114,6 +116,29 @@ public class HotelCalendarView extends CalendarView {
     }
 
     /**
+     * 处理在入住 和 离店时间中间的item的背景
+     * @param itemView
+     * @param mTvTitle
+     * @param mTvDesc
+     * @param dateBean
+     */
+    @Override
+    protected void dealInEnterAndOutTimeStyle(View itemView, LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+        itemView.setBackground(new ShapeDrawable(new Shape() {
+            @Override
+            public void draw(Canvas canvas, Paint paint) {
+                int width = itemView.getWidth();
+                int height = itemView.getHeight();
+                paint.setAntiAlias(true);
+                paint.setDither(true);
+                paint.setColor(ContextCompat.getColor(getContext(), R.color.color_manyday_selected));
+                RectF rectF = new RectF(0, 0, width, height);
+                canvas.drawRoundRect(rectF, 0, 0, paint);
+            }
+        }));
+    }
+
+    /**
      * 处理酒店中选中入住 及 离店时间的选中效果
      *
      * @param itemView
@@ -123,12 +148,37 @@ public class HotelCalendarView extends CalendarView {
      * @param isEnter
      */
     @Override
-    protected void dealEnterOrOutDayStyle(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean, boolean isEnter) {
+    protected void dealEnterOrOutDayStyle(View itemView,LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean, boolean isEnter) {
+
         itemView.setBackground(new ShapeDrawable(new Shape() {
             @Override
             public void draw(Canvas canvas, Paint paint) {
                 int width = itemView.getWidth();
                 int height = itemView.getHeight();
+                paint.setAntiAlias(true);
+                paint.setDither(true);
+                paint.setColor(ContextCompat.getColor(getContext(), R.color.color_manyday_selected));
+                RectF rectF1 = new RectF(0,0,width,height);
+                canvas.drawRoundRect(rectF1,height/2,height/2,paint);
+                if(enterHotelTime==null || outHotelTime==null){
+
+                }else{
+                    RectF rectF;
+                    if(isEnter){
+                        rectF = new RectF(width/2, 0, width, height);
+                    }else{
+                        rectF = new RectF(0, 0, width-width/2, height);
+                    }
+                    canvas.drawRoundRect(rectF, 0, 0, paint);
+                }
+
+            }
+        }));
+        mLLDay.setBackground(new ShapeDrawable(new Shape() {
+            @Override
+            public void draw(Canvas canvas, Paint paint) {
+                int width = mLLDay.getWidth();
+                int height = mLLDay.getHeight();
                 paint.setAntiAlias(true);
                 paint.setDither(true);
                 paint.setColor(ContextCompat.getColor(getContext(), R.color.color_day_selected));
