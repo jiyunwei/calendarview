@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/dp_12">
+
+    <ImageView
+        android:id="@+id/iv_house_typeimg"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/icon_hotel_demo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_60"
+        android:layout_marginLeft="@dimen/dp_12"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toRightOf="@+id/iv_house_typeimg"
+        app:layout_constraintRight_toLeftOf="@+id/tvYuding"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="精品大床房"
+            android:textColor="@color/color_17171a"
+            android:textSize="@dimen/sp_12"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="25m2 双人床 1.8米 有窗"
+            android:textColor="@color/color_hotel_desctextcolor"
+            android:textSize="@dimen/sp_11"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="￥328"
+            android:textColor="@color/color_hotel_price"
+            android:textSize="@dimen/sp_15"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvYuding"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/dp_8"
+        android:paddingHorizontal="@dimen/dp_20"
+        android:paddingVertical="6dp"
+        android:text="预定"
+        android:textSize="@dimen/sp_11"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:background="@drawable/hotel_yudingback_shape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_mapback_color"
+        app:layout_constraintTop_toBottomOf="@+id/iv_house_typeimg"
+        android:layout_marginTop="@dimen/dp_12"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

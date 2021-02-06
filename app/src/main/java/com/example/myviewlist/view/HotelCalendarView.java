@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -15,6 +16,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +40,8 @@ import java.util.Date;
 
 public class HotelCalendarView extends CalendarView {
 
+
+    private int tempLeftPoint,tempTopPoint;
 
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -77,18 +88,18 @@ public class HotelCalendarView extends CalendarView {
     }
 
     @Override
-    public void dealOnDayClicked(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
-        super.dealOnDayClicked(itemView, mTvTitle, mTvDesc, dateBean);
+    public void dealOnDayClicked(View itemView,LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+        super.dealOnDayClicked(itemView,mLLDay, mTvTitle, mTvDesc, dateBean);
         Log.d(TAG, "dealOnDayClicked: 酒店日历处理每天的点击事件...");
         if (isLegalDate(dateBean)) {
             //不是过期的日期 包括今天之前的 和 30天之外的
             if (enterHotelTime == null) {
                 enterHotelTime = dateBean.getTime();
-
             } else if (outHotelTime == null
                     && compareDate(dateBean.getTime(), enterHotelTime)) {
                 if (compareLessThan30Day(dateBean.getTime(), enterHotelTime)) {
                     outHotelTime = dateBean.getTime();
+
                 } else {
                     //离店日期范围超出了30天
                     showToast("入住周期不能大于30天");
@@ -99,6 +110,7 @@ public class HotelCalendarView extends CalendarView {
             } else {
                 enterHotelTime = dateBean.getTime();
                 outHotelTime = null;
+
 
             }
 
@@ -114,6 +126,8 @@ public class HotelCalendarView extends CalendarView {
             }
         }
     }
+
+
 
     /**
      * 处理在入住 和 离店时间中间的item的背景
@@ -187,6 +201,7 @@ public class HotelCalendarView extends CalendarView {
             }
         }));
 
+
         mTvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         mTvTitle.setTextColor(Color.WHITE);
         if(compareDateEquals(dateBean.getTime(),new Date())){
@@ -195,6 +210,7 @@ public class HotelCalendarView extends CalendarView {
         mTvDesc.setVisibility(VISIBLE);
         mTvDesc.setTextColor(Color.WHITE);
         mTvDesc.setText(isEnter ? "入住" : "离店");
+
     }
 
     /**

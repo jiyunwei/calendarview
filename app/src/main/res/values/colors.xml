@@ -10,7 +10,17 @@
     <color name="week_back_shape">#EDFDF4</color>
     <color name="color_day_selected">#04E179</color>
     <color name="color_manyday_selected">#DBFBEC</color>
+    <color name="color_17171a">#17171a</color>
+    <color name="color_121212">#121212</color>
     <color name="color_333333">#333333</color>
     <color name="color_666666">#666666</color>
     <color name="color_999999">#999999</color>
+    <color name="color_mapback_color">#f2f0ed</color>
+    <color name="color_cardview_shadowcolor">#30bbbbbb</color>
+    <color name="color_hotel_tagback">#f6f6f6</color>
+    <color name="color_hotel_tagtextcolor">#cacaca</color>
+    <color name="color_hotel_desctextcolor">#5c6060</color>
+    <color name="color_hotel_dateback">#f1fefa</color>
+    <color name="color_hotel_main">#00e178</color>
+    <color name="color_hotel_price">#ff675f</color>
 </resources>

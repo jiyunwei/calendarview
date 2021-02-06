@@ -85,6 +85,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
             monthMaxCount = 36;
         }
         mRvMonths = mView.findViewById(R.id.rvMonths);
+
         mMonthAdapter = new MyMonthAdapter(context);
         mRvMonths.setAdapter(mMonthAdapter);
         mRvMonths.setLayoutManager(new LinearLayoutManager(context));
@@ -355,7 +356,8 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
             holder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    dealOnDayClicked(holder.itemView, holder.mTvTitle, holder.mTvDesc, dateBean);
+                    Log.d(TAG, "onClick: "+v.getLeft());
+                    dealOnDayClicked(holder.itemView, holder.mLLDay, holder.mTvTitle, holder.mTvDesc, dateBean);
                 }
             });
 
@@ -401,7 +403,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
      * @param mTvDesc
      * @param dateBean
      */
-    public void dealOnDayClicked(View itemView, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+    public void dealOnDayClicked(View itemView,LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
         Log.d(TAG, "dealOnDayClicked: 基础日历处理天item的点击事件...");
     }
 
