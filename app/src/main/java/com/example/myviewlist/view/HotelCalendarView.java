@@ -43,6 +43,8 @@ public class HotelCalendarView extends CalendarView {
 
     private int tempLeftPoint,tempTopPoint;
 
+
+
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -50,6 +52,9 @@ public class HotelCalendarView extends CalendarView {
             if (enterHotelTime != null && outHotelTime != null) {
                 logd("选择的入住日期：" + sdf.format(enterHotelTime) + " 离店日期：" + sdf.format(outHotelTime));
                 showToast("选择的入住日期：" + sdf.format(enterHotelTime) + " 离店日期：" + sdf.format(outHotelTime));
+                if(onDateSelectedListener!=null){
+                    onDateSelectedListener.onDateSelected(enterHotelTime,outHotelTime);
+                }
             }
         }
     };
@@ -121,7 +126,7 @@ public class HotelCalendarView extends CalendarView {
                 Log.d(TAG, "dealOnDayClicked: 清理了消息....");
             }
             if (enterHotelTime != null && outHotelTime != null) {
-                mHandler.sendEmptyMessageDelayed(1, 5000);
+                mHandler.sendEmptyMessageDelayed(1, 2000);
                 Log.d(TAG, "dealOnDayClicked: 开始延迟消息...");
             }
         }

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myviewlist.R;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,7 +33,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
     protected static final String TAG = "CalendarView";
 
     private View mView;
-    private OnDateSelectedListener onDateSelectedListener;
+    protected OnDateSelectedListener onDateSelectedListener;
     private RecyclerView mRvMonths;
     private MyMonthAdapter mMonthAdapter;
     private Calendar mCalendar;
@@ -44,7 +45,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
     private Date enter; //入住酒店的时间
     private Date out; //离开酒店的时间
 
-    protected void setEnterAndOutHotelTime(Date enter, Date out) {
+    public void setEnterAndOutHotelTime(Date enter, Date out) {
         this.enter = enter;
         this.out = out;
 
@@ -356,7 +357,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
             holder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "onClick: "+v.getLeft());
+                    Log.d(TAG, "onClick: " + v.getLeft());
                     dealOnDayClicked(holder.itemView, holder.mLLDay, holder.mTvTitle, holder.mTvDesc, dateBean);
                 }
             });
@@ -403,7 +404,7 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
      * @param mTvDesc
      * @param dateBean
      */
-    public void dealOnDayClicked(View itemView,LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
+    public void dealOnDayClicked(View itemView, LinearLayout mLLDay, TextView mTvTitle, TextView mTvDesc, DateBean dateBean) {
         Log.d(TAG, "dealOnDayClicked: 基础日历处理天item的点击事件...");
     }
 
@@ -570,11 +571,30 @@ public class CalendarView extends LinearLayout implements IBaseCalendar {
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.setTime(date1);
+        calendar1.setTime(resetDate(calendar1));
+
 
         Calendar calendar2 = Calendar.getInstance();
         calendar2.setTime(date2);
+        calendar2.setTime(resetDate(calendar2));
 
         return calendar1.compareTo(calendar2) > 0;
+    }
+
+    private Date resetDate(Calendar calendar) {
+        int y = calendar.get(Calendar.YEAR);
+        int m = calendar.get(Calendar.MONTH);
+        int d = calendar.get(Calendar.DATE);
+        String d1 = y + "-" + m + "-" + d + " 01:00:00";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date= new Date();
+        try {
+            date = sdf.parse(d1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 
 }
