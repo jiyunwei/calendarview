@@ -7,4 +7,5 @@
         <item>WebView测试</item>
         <item>测试</item>
     </string-array>
+    <string name="hotel_detail_title_behavior">com.example.myviewlist.view.HotelDetailTitleBehavior</string>
 </resources>
