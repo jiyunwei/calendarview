@@ -1,2 +1,3 @@
+include ':hotelcalendar'
 include ':app'
 rootProject.name = "MyViewList"

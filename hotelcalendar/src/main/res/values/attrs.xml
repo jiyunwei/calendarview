@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CalendarView">
+        <attr name="maxMonthCount" format="integer"/>
+    </declare-styleable>
+    <declare-styleable name="CalendarWeekTitle">
+        <attr name="weekTextSize" format="integer"/>
+        <attr name="weekTextColor" format="reference"/>
+        <attr name="weekTextIsBold" format="boolean"/>
+    </declare-styleable>
+</resources>
