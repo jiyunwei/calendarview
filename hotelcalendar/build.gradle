@@ -1,6 +1,13 @@
 plugins {
     id 'com.android.library'
+    id 'com.github.dcendents.android-maven'
+
 }
+
+//你的Github用户名替换一下
+group='com.github.jiyunwei'
+
+
 
 android {
     compileSdkVersion 30
